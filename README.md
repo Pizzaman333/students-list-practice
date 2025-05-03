@@ -1,1 +1,0 @@
-# students-list-practice
