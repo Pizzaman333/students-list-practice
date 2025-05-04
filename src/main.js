@@ -1,1 +1,1 @@
-console.log("sdsffsfs")
+import "./js/app"
