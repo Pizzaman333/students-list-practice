@@ -700,8 +700,9 @@ document.getElementById("get-students-btn").addEventListener("click", function()
         console.error("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u043F\u0440\u0438 \u0437\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0435\u043D\u043D\u0456 \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u0456\u0432:", error);
     });
 });
-function deleteStudent(id) {
-    (0, _deleteStudentsAPI.deleteStudentsApi)(id);
+async function deleteStudent(id) {
+    await (0, _deleteStudentsAPI.deleteStudentsApi)(id);
+    await (0, _getStudentsAPI.getStudentsApi)().then((students)=>createLayout(students));
 }
 let studentToChange = 0;
 document.getElementById("students-table").addEventListener("click", (event)=>{
@@ -717,7 +718,7 @@ document.getElementById("students-table").addEventListener("click", (event)=>{
         studentToChange = event.target.parentNode.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.textContent;
     } else if (event.target.classList.contains("delete__btn")) deleteStudent(event.target.parentNode.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.textContent);
 });
-document.getElementById("add-student-form").addEventListener("submit", (event)=>{
+document.getElementById("add-student-form").addEventListener("submit", async (event)=>{
     event.preventDefault();
     const obj = {
         name: document.getElementById("name").value.trim(),
@@ -727,16 +728,17 @@ document.getElementById("add-student-form").addEventListener("submit", (event)=>
         email: document.getElementById("email").value.trim(),
         isEnrolled: document.getElementById("isEnrolled").checked
     };
-    (0, _addStudentsAPI.addStudentsApi)(obj);
+    await (0, _addStudentsAPI.addStudentsApi)(obj);
     document.getElementById("name").value = "";
     document.getElementById("age").value = "";
     document.getElementById("course").value = "";
     document.getElementById("skills").value = "";
     document.getElementById("email").value = "";
     document.getElementById("isEnrolled").checked = false;
+    await (0, _getStudentsAPI.getStudentsApi)().then((students)=>createLayout(students));
 });
 document.querySelector(".cross").addEventListener("click", (event)=>document.querySelector(".backdrop").classList.add("is-hidden"));
-document.getElementById("change-student-form").addEventListener("submit", (event)=>{
+document.getElementById("change-student-form").addEventListener("submit", async (event)=>{
     event.preventDefault();
     const obj = {
         name: document.getElementById("modal-name").value.trim(),
@@ -746,16 +748,23 @@ document.getElementById("change-student-form").addEventListener("submit", (event
         email: document.getElementById("modal-email").value.trim(),
         isEnrolled: document.getElementById("modal-isEnrolled").checked
     };
-    (0, _updateStudentsAPI.updateStudentsApi)(`${studentToChange}`, obj);
+    await (0, _updateStudentsAPI.updateStudentsApi)(`${studentToChange}`, obj);
     document.querySelector(".backdrop").classList.add("is-hidden");
+    await (0, _getStudentsAPI.getStudentsApi)().then((students)=>createLayout(students));
 });
 
 },{"./services/getStudentsAPI":"ici7H","./services/deleteStudentsAPI":"cy75b","./services/addStudentsAPI":"3JfjX","./services/updateStudentsAPI":"6EcHS"}],"ici7H":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "getStudentsApi", ()=>getStudentsApi);
-const getStudentsApi = ()=>{
-    return fetch("https://681738fd26a599ae7c39acb9.mockapi.io/students/students").then((response)=>response.json());
+const getStudentsApi = async ()=>{
+    try {
+        const response = await fetch("https://681738fd26a599ae7c39acb9.mockapi.io/students/students");
+        return await response.json();
+    } catch (error) {
+        console.error("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u043F\u0440\u0438 \u0437\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0435\u043D\u043D\u0456 \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u0456\u0432:", error);
+        return null;
+    }
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jnFvT":[function(require,module,exports,__globalThis) {
@@ -792,41 +801,56 @@ exports.export = function(dest, destName, get) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "deleteStudentsApi", ()=>deleteStudentsApi);
-const deleteStudentsApi = (studentId)=>{
-    return fetch(`https://681738fd26a599ae7c39acb9.mockapi.io/students/students/${studentId}`, {
-        method: "DELETE"
-    }).then((response)=>{
-        if (!response.ok) throw new Error(`Failed to delete student with ID: ${studentId}`);
-        return response.json();
-    });
+const deleteStudentsApi = async (studentId)=>{
+    try {
+        const response = await fetch(`https://681738fd26a599ae7c39acb9.mockapi.io/students/students/${studentId}`, {
+            method: "DELETE"
+        });
+        return await response.json();
+    } catch (error) {
+        console.error("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u043F\u0440\u0438 \u0432\u0438\u0434\u0430\u043B\u0435\u043D\u043D\u0456 \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u0430:", error);
+        return null;
+    }
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"3JfjX":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "addStudentsApi", ()=>addStudentsApi);
-const addStudentsApi = (studentData)=>{
-    return fetch("https://681738fd26a599ae7c39acb9.mockapi.io/students/students", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(studentData)
-    }).then((response)=>response.json());
+const addStudentsApi = async (studentData)=>{
+    try {
+        const response = await fetch("https://681738fd26a599ae7c39acb9.mockapi.io/students/students", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(studentData)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u043F\u0440\u0438 \u0434\u043E\u0434\u0430\u0432\u0430\u043D\u043D\u0456 \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u0430:", error);
+        return null;
+    }
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6EcHS":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "updateStudentsApi", ()=>updateStudentsApi);
-const updateStudentsApi = (studentId, updatedData)=>{
-    return fetch(`https://681738fd26a599ae7c39acb9.mockapi.io/students/students/${studentId}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(updatedData)
-    }).then((response)=>response.json());
+const updateStudentsApi = async (studentId, updatedData)=>{
+    try {
+        const response = await fetch(`https://681738fd26a599ae7c39acb9.mockapi.io/students/students/${studentId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedData)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u043F\u0440\u0438 \u043E\u043D\u043E\u0432\u043B\u0435\u043D\u043D\u0456 \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u0430:", error);
+        return null;
+    }
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["iUuJv","fILKw"], "fILKw", "parcelRequire0840", {})
