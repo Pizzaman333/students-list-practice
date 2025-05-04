@@ -37,8 +37,9 @@ document
       });
   });
 
-function deleteStudent(id) {
-  deleteStudentsApi(id);
+async function deleteStudent(id) {
+  await deleteStudentsApi(id);
+  await getStudentsApi().then((students) => createLayout(students));
 }
 let studentToChange = 0;
 
@@ -78,7 +79,7 @@ document.getElementById("students-table").addEventListener("click", (event) => {
 
 document
   .getElementById("add-student-form")
-  .addEventListener("submit", (event) => {
+  .addEventListener("submit", async (event) => {
     event.preventDefault();
     const obj = {
       name: document.getElementById("name").value.trim(),
@@ -93,13 +94,14 @@ document
       email: document.getElementById("email").value.trim(),
       isEnrolled: document.getElementById("isEnrolled").checked,
     };
-    addStudentsApi(obj);
+    await addStudentsApi(obj);
     document.getElementById("name").value = "";
     document.getElementById("age").value = "";
     document.getElementById("course").value = "";
     document.getElementById("skills").value = "";
     document.getElementById("email").value = "";
     document.getElementById("isEnrolled").checked = false;
+    await getStudentsApi().then((students) => createLayout(students));
   });
 
 document
@@ -110,7 +112,7 @@ document
 
 document
   .getElementById("change-student-form")
-  .addEventListener("submit", (event) => {
+  .addEventListener("submit", async (event) => {
     event.preventDefault();
     const obj = {
       name: document.getElementById("modal-name").value.trim(),
@@ -125,6 +127,7 @@ document
       email: document.getElementById("modal-email").value.trim(),
       isEnrolled: document.getElementById("modal-isEnrolled").checked,
     };
-    updateStudentsApi(`${studentToChange}`, obj);
+    await updateStudentsApi(`${studentToChange}`, obj);
     document.querySelector(".backdrop").classList.add("is-hidden");
+    await getStudentsApi().then((students) => createLayout(students));
   });
